@@ -662,15 +662,18 @@ function handleSubmit() {
 
   document.body.appendChild(hiddenForm);
   hiddenForm.submit();
-  document.body.removeChild(hiddenForm);
+  // Do NOT remove the form - browser needs it in DOM to complete submission
+  // It will be cleaned up automatically after iframe loads
 
-  // Show success screen
+  // Show success screen after delay (gives form time to submit)
   setTimeout(function() {
     document.getElementById('formBody').classList.add('hide');
     document.getElementById('cardFooter').classList.add('hide');
     document.getElementById('successScreen').classList.add('show');
     window.scrollTo({top: 0, behavior: 'smooth'});
-  }, 800);
+    // Clean up the hidden form after everything is done
+    if (hiddenForm.parentNode) hiddenForm.parentNode.removeChild(hiddenForm);
+  }, 1500);
 }
 </script>
 
