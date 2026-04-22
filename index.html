@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Camusat Group – Annual Executive Seminar 2026</title>
+<title>Camusat Group – Community Gathering 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Calibri:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   /* ─── Camusat Brand Tokens ─── */
@@ -630,54 +630,43 @@ function handleSubmit() {
   }
   if (!valid) return;
 
-  const btn = document.querySelector('.submit-btn');
-  btn.textContent = 'Sending...';
-  btn.disabled = true;
+  // Copy all values into the real hidden Google Form and submit it directly
+  // This is identical to how the plain HTML test form works - most reliable method
+  document.getElementById('g_firstName').value  = document.getElementById('firstName').value;
+  document.getElementById('g_lastName').value   = document.getElementById('lastName').value;
+  document.getElementById('g_jobTitle').value   = document.getElementById('jobTitle').value;
+  document.getElementById('g_department').value = document.getElementById('department').value;
+  document.getElementById('g_email').value      = email;
+  document.getElementById('g_phone').value      = document.getElementById('phone').value;
+  document.getElementById('g_attendance').value = attendance.value;
 
-  // Map our field values to Google Form entry IDs
-  const googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeYE11IltPHFLf5yHkU7h3z0epOen8r0KEoN32RtDfYE7cJPg/formResponse';
+  // Submit into the hidden iframe so the page doesn't redirect
+  document.getElementById('googleForm').submit();
 
-  const formData = new FormData();
-  formData.append('entry.795120008', document.getElementById('firstName').value);
-  formData.append('entry.1633028278',  document.getElementById('lastName').value);
-  formData.append('entry.1376339485', document.getElementById('jobTitle').value);
-  formData.append('entry.599995471',  document.getElementById('department').value);
-  formData.append('entry.1099218932',  email);
-  formData.append('entry.1197826893',  document.getElementById('phone').value);
-  formData.append('entry.1466750582', attendance.value);
-
-  // Submit silently to Google Forms via hidden iframe - no CORS issues
-  const hiddenForm = document.createElement('form');
-  hiddenForm.method  = 'POST';
-  hiddenForm.action  = googleFormUrl;
-  hiddenForm.target  = 'hidden_iframe';
-
-  formData.forEach(function(value, key) {
-    const input   = document.createElement('input');
-    input.type    = 'hidden';
-    input.name    = key;
-    input.value   = value;
-    hiddenForm.appendChild(input);
-  });
-
-  document.body.appendChild(hiddenForm);
-  hiddenForm.submit();
-  // Do NOT remove the form - browser needs it in DOM to complete submission
-  // It will be cleaned up automatically after iframe loads
-
-  // Show success screen after delay (gives form time to submit)
+  // Show success screen
   setTimeout(function() {
     document.getElementById('formBody').classList.add('hide');
     document.getElementById('cardFooter').classList.add('hide');
     document.getElementById('successScreen').classList.add('show');
     window.scrollTo({top: 0, behavior: 'smooth'});
-    // Clean up the hidden form after everything is done
-    if (hiddenForm.parentNode) hiddenForm.parentNode.removeChild(hiddenForm);
-  }, 1500);
+  }, 1000);
 }
 </script>
 
-<!-- Invisible iframe — catches Google's response so the page never redirects -->
-<iframe name="hidden_iframe" style="display:none;"></iframe>
+<!-- Real Google Form hidden in the page - submits into invisible iframe so page never redirects -->
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+<form id="googleForm"
+      method="POST"
+      action="https://docs.google.com/forms/d/e/1FAIpQLSeYE11IltPHFLf5yHkU7h3z0epOen8r0KEoN32RtDfYE7cJPg/formResponse"
+      target="hidden_iframe"
+      style="display:none;">
+  <input type="hidden" id="g_firstName"  name="entry.795120008"  value="">
+  <input type="hidden" id="g_lastName"   name="entry.1633028278" value="">
+  <input type="hidden" id="g_jobTitle"   name="entry.1376339485" value="">
+  <input type="hidden" id="g_department" name="entry.599995471"  value="">
+  <input type="hidden" id="g_email"      name="entry.1099218932" value="">
+  <input type="hidden" id="g_phone"      name="entry.1197826893" value="">
+  <input type="hidden" id="g_attendance" name="entry.1466750582" value="">
+</form>
 </body>
 </html>
